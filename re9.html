@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Requirement 9 - Block USB Storage | CPTR 325</title>
+
+  <style>
+    :root {
+      --primary-color: #1a1a1a;
+      --primary-dark: #2c2c2c;
+      --secondary-color: #3d3d3d;
+      --accent-color: #8a8a8a;
+
+      --background: #f5f5f3;
+      --section-bg: #eeede9;
+      --surface: #ffffff;
+
+      --text-primary: #1a1f2b;
+      --text-secondary: #4b5563;
+      --text-light: #ffffff;
+
+      --border-color: #d4d2cd;
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+      --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.12);
+      --shadow-lg: 0 15px 40px rgba(0, 0, 0, 0.18);
+
+      --radius: 16px;
+      --radius-lg: 28px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-dark), var(--secondary-color)),
+        url('bg2.jpg');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      color: var(--text-light);
+      line-height: 1.7;
+      min-height: 100vh;
+      padding: 3rem 5%;
+    }
+
+    /* =========================
+       NAVBAR
+    ========================= */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      padding: 18px 6%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(28, 28, 28, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      z-index: 1000;
+    }
+
+    .logo {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--text-light);
+      letter-spacing: 1px;
+    }
+
+    .nav-links {
+      list-style: none;
+      display: flex;
+      gap: 24px;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--text-light);
+      font-weight: 500;
+      transition: 0.3s ease;
+    }
+
+    .nav-links a:hover {
+      color: #d0d0d0;
+    }
+
+    /* TITLE */
+    .page-title {
+      text-align: center;
+      margin-top: 6rem;
+      margin-bottom: 2.5rem;
+    }
+
+    h1 {
+      font-size: 2.75rem;
+      font-weight: 800;
+      background: white;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    h4 {
+      color: var(--accent-color);
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      padding-left: 1rem;
+      border-left: 4px solid var(--accent-color);
+    }
+
+    /* MAIN LAYOUT */
+    .doc-template {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      align-items: start;
+      margin-bottom: 3rem;
+      margin-left: 5rem;
+      margin-top: 3rem;
+    }
+
+    .doc-template h4{
+      margin-top: 5rem;
+    }
+
+    /* VERIFICATION LIST */
+    .verification-list {
+      list-style: none;
+      padding: 0;
+      margin: 1rem 0 1.5rem 0;
+    }
+
+    .verification-list li {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.85rem 1rem;
+      margin-bottom: 0.75rem;
+      background: rgba(255,255,255,0.06);
+      border-radius: var(--radius);
+      font-size: 0.95rem;
+      transition: 0.3s;
+    }
+
+    .verification-list li:hover {
+      transform: translateY(-3px);
+      background: rgba(255, 255, 255, 0.275);
+    }
+
+    .doc-image {
+      width: 100%;
+      max-width: 600px;
+      height: auto;
+      object-fit: contain;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      display: block;
+      margin: 50px auto 0 auto;
+    }
+
+    .doc-image:hover {
+      box-shadow: 0 0 25px var(--accent-color);
+      transition: box-shadow 0.3s ease;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-top: 3rem;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      background: linear-gradient(135deg, var(--accent-color), var(--secondary-color));
+      color: var(--text-light);
+      padding: 1rem 2.2rem;
+      border-radius: var(--radius-lg);
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      text-decoration: none;
+      display: inline-block;
+      border: 2px solid var(--surface);
+      box-shadow: var(--shadow-lg);
+      transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-4px) scale(1.05);
+      background: linear-gradient(135deg, var(--secondary-color), var(--accent-color));
+      border-color: var(--border-color);
+      box-shadow: 0 0 25px var(--accent-color);
+    }
+
+    @media (max-width: 768px) {
+      .doc-template {
+        grid-template-columns: 1fr;
+        margin-left: 0;
+      }
+      h1 {
+        font-size: 2rem;
+      }
+      .doc-image {
+        margin-top: 30px;
+      }
+    }
+
+    /* PAGE TRANSITIONS */
+    @keyframes fadeIn  { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeOut { to   { opacity: 0; transform: translateY(-10px); } }
+    .page-content { animation: fadeIn 0.25s ease both; }
+    .page-content.fade-out { animation: fadeOut 0.2s ease forwards; }
+  
+    /* ── STEP LIST ── */
+    .step-list {
+      list-style: none;
+      counter-reset: step-counter;
+      padding-left: 0;
+      position: relative;
+    }
+
+    /* vertical track line */
+    .step-list::before {
+      content: '';
+      position: absolute;
+      left: 18px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 2px;
+    }
+
+    .step-list li {
+      counter-increment: step-counter;
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      margin-bottom: 0.85rem;
+      padding: 0.9rem 1.1rem 0.9rem 0;
+      position: relative;
+      font-size: 0.93rem;
+      line-height: 1.65;
+    }
+
+    /* square step tag */
+    .step-list li::before {
+      content: counter(step-counter);
+      min-width: 36px;
+      height: 36px;
+      border-radius: 6px;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.9);
+      flex-shrink: 0;
+      letter-spacing: 0.5px;
+      margin-left: 0;
+      transition: background 0.25s, border-color 0.25s;
+    }
+
+    .step-list li:hover::before {
+      background: rgba(255,255,255,0.22);
+      border-color: rgba(255,255,255,0.5);
+    }
+
+    .step-list li:hover {
+      color: #fff;
+    }
+
+    /* ── CODE BLOCK ── */
+    .code-block {
+      background: #141414;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.45);
+      position: relative;
+      font-family: 'Consolas', 'Courier New', monospace;
+    }
+
+    /* terminal top bar */
+    .code-block::before {
+      content: '● ● ●';
+      display: block;
+      background: #222;
+      color: rgba(255,255,255,0.25);
+      font-size: 0.65rem;
+      letter-spacing: 4px;
+      padding: 0.5rem 1rem;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+
+    .code-block pre {
+      padding: 1.2rem 1.4rem;
+      font-size: 0.82rem;
+      line-height: 1.65;
+      color: #d4d4d4;
+      overflow-x: auto;
+      overflow-y: auto;
+      max-height: 420px;
+      white-space: pre;
+      margin: 0;
+    }
+
+    /* HOME BUTTON */
+    .home-btn {
+      text-decoration: none;
+      color: var(--text-light);
+      font-weight: 600;
+      font-size: 0.95rem;
+      padding: 0.45rem 1.1rem;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.08);
+      transition: all 0.25s ease;
+      letter-spacing: 0.3px;
+    }
+
+    .home-btn:hover {
+      background: rgba(255,255,255,0.18);
+      border-color: rgba(255,255,255,0.4);
+      transform: translateY(-1px);
+    }
+
+    /* /* RESPONSIVE */
+
+    @media(max-width:768px){
+
+      .doc-template{
+        grid-template-columns:1fr;
+      }
+
+      h1{
+        font-size:2rem;
+      }
+    }
+
+</style>
+</head>
+
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="logo">CPTR 325</div>
+    <a href="home.html" class="home-btn">🏠 Home</a>
+    <!-- <ul class="nav-links">
+      <li><a href="home.html" class="nav-link">Home</a></li>
+      <li><a href="#members" class="nav-link">Members</a></li>
+      <li><a href="#requirements" class="nav-link">Requirements</a></li>
+      <li><a href="#reflection" class="nav-link">Reflection</a></li>
+      <li><a href="#references" class="nav-link">References</a></li>
+    </ul> -->
+  </nav>
+
+  <div class="page-content">
+  <!-- TITLE -->
+  <div class="page-title">
+    <h1>Requirement 9: Block USB Storage for Students</h1>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="doc-template">
+    <!-- LEFT: GPO Steps -->
+    <div>
+      <h4 class="">Manual GPO Method:</h4>
+      <ol class="step-list">
+        <li>GPMC → Create GPO "BLOCK_USB_STUDENTS" → Link to All Student OUs</li>
+        <li>Computer Config → Policies → Admin Templates → System → Removable Storage Access</li>
+        <li>Enable "All Removable Storage classes: Deny all access"</li>
+        <li>TEST: Student PC → USB drive = Access Denied | Teacher PC = USB works</li>
+      </ol>
+    </div>
+
+    <!-- RIGHT: Verification + Image -->
+    <div>
+      <h4>Verification:</h4>
+      <ul class="verification-list">
+        <li>❌ Student: USB = "Access Denied" | File Explorer = No removable drives</li>
+        <li>✅ Teacher: Full USB read/write access confirmed</li>
+      </ul>
+      <img src="8.jpg" alt="GPO Block USB Storage Enabled" class="doc-image">
+    </div>
+  </div>
+
+  <!-- BUTTONS -->
+  <div class="btn-group">
+    <a href="re8.html" class="btn">← Back</a>
+    <a href="https://youtu.be/CSuLULLEO_g" target="_blank" rel="noopener noreferrer" class="btn">Watch Here</a>
+    <a href="re10.html" class="btn">Requirement 10 →</a>
+  </div>
+
+  </div><!-- end page-content -->
+
+  <script>
+
+    document
+    .querySelectorAll(".btn")
+    .forEach(btn => {
+
+      if(!btn.hasAttribute("onclick")){
+
+        btn.addEventListener("click", e => {
+
+          e.preventDefault();
+
+          const href =
+          btn.getAttribute("href");
+
+          document
+          .querySelector(".page-content")
+          .classList.add("fade-out");
+
+          setTimeout(() => {
+
+            location.href = href;
+
+          }, 200);
+
+        });
+
+      }
+
+    });
+
+    </script>
+</body>
+</html>

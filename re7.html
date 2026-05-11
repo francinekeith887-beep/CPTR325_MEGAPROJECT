@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Requirement 7: Home Folders + 100MB FSRM Quota | CPTR 325</title>
+
+  <style>
+    :root {
+      --primary-color: #1a1a1a;
+      --primary-dark: #2c2c2c;
+      --secondary-color: #3d3d3d;
+      --accent-color: #8a8a8a;
+      --surface: #ffffff;
+      --text-light: #ffffff;
+      --border-color: #d4d2cd;
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+      --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.12);
+      --shadow-lg: 0 15px 40px rgba(0, 0, 0, 0.18);
+      --radius: 16px;
+      --radius-lg: 28px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-dark), var(--secondary-color)),
+        url('bg2.jpg');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      color: var(--text-light);
+      line-height: 1.7;
+      min-height: 100vh;
+      padding: 3rem 5%;
+    }
+
+    /* NAVBAR */
+    .navbar {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      padding: 18px 6%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(28, 28, 28, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      z-index: 1000;
+    }
+
+    .logo {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--text-light);
+      letter-spacing: 1px;
+    }
+
+    /* TITLE */
+    .page-title {
+      text-align: center;
+      margin-top: 6rem;
+      margin-bottom: 2rem;
+    }
+
+    h1 {
+      font-size: 2.75rem;
+      font-weight: 800;
+      background: white;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    h4 {
+      color: var(--accent-color);
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin: 2rem 0 1rem 0;
+      padding-left: 1rem;
+      border-left: 4px solid var(--accent-color);
+    }
+
+    /* QUOTA CARD */
+    .quota-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      margin: 2rem auto;
+      max-width: 1200px;
+      text-align: center;
+    }
+
+    .quota-card h4 {
+      margin: 0;
+      margin-top: 3rem;
+    }
+
+    .quota-limit {
+      font-size: 3.5rem;
+      font-weight: 800;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid var(--accent-color);
+      border-radius: var(--radius);
+      padding: 0.5rem 1.5rem;
+      display: inline-block;
+      box-shadow: var(--shadow-md);
+      color: white;
+    }
+
+    /* CODE WRAP */
+    .code-wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+      margin-bottom: 5rem;
+      margin-top: 7rem;
+    }
+
+    /* Side-by-side layout */
+    .code-image-row {
+      display: flex;
+      gap: 2rem;
+      align-items: flex-start;
+    }
+
+    /* CODE BLOCK — 60% width */
+    .code-image-row .code-block {
+      flex: 1 1 60%;
+      min-width: 0;
+    }
+
+    /* IMAGE WRAP — 40% fixed */
+    .doc-image-wrap {
+      flex: 0 0 40%;
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+    }
+
+    .doc-image {
+      width: 100%;
+      height: 400px;
+      object-fit: cover;
+      object-position: center;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      display: block;
+      transition: box-shadow 0.3s ease;
+      margin-top: -1.3rem;
+      margin-bottom: 3rem;
+    }
+
+    .doc-image:hover {
+      box-shadow: 0 0 25px var(--accent-color);
+    }
+
+    /* BUTTONS */
+    .btn-group {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-top: 3rem;
+      margin-bottom: 3rem;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      background: linear-gradient(135deg, var(--accent-color), var(--secondary-color));
+      color: var(--text-light);
+      padding: 1rem 2.2rem;
+      border-radius: var(--radius-lg);
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      text-decoration: none;
+      display: inline-block;
+      border: 2px solid var(--surface);
+      box-shadow: var(--shadow-lg);
+      transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-4px) scale(1.05);
+      background: linear-gradient(135deg, var(--secondary-color), var(--accent-color));
+      border-color: var(--border-color);
+      box-shadow: 0 0 25px var(--accent-color);
+    }
+
+    /* MOBILE */
+    @media (max-width: 768px) {
+      h1 { font-size: 2rem; }
+      .quota-limit { font-size: 2.5rem; }
+      .code-image-row { flex-direction: column; }
+      .doc-image-wrap { flex: 1 1 100%; }
+      .doc-image { height: 220px; }
+    }
+
+    /* PAGE TRANSITIONS */
+    @keyframes fadeIn  { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeOut { to   { opacity: 0; transform: translateY(-10px); } }
+    .page-content { animation: fadeIn 0.25s ease both; }
+    .page-content.fade-out { animation: fadeOut 0.2s ease forwards; }
+
+    /* ── STEP LIST ── */
+    .step-list {
+      list-style: none;
+      counter-reset: step-counter;
+      padding-left: 0;
+      position: relative;
+    }
+
+    .step-list::before {
+      content: '';
+      position: absolute;
+      left: 18px; top: 0; bottom: 0;
+      width: 2px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 2px;
+    }
+
+    .step-list li {
+      counter-increment: step-counter;
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      margin-bottom: 0.85rem;
+      padding: 0.9rem 1.1rem 0.9rem 0;
+      position: relative;
+      font-size: 0.93rem;
+      line-height: 1.65;
+    }
+
+    .step-list li::before {
+      content: counter(step-counter);
+      min-width: 36px;
+      height: 36px;
+      border-radius: 6px;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.9);
+      flex-shrink: 0;
+      letter-spacing: 0.5px;
+      transition: background 0.25s, border-color 0.25s;
+    }
+
+    .step-list li:hover::before {
+      background: rgba(255,255,255,0.22);
+      border-color: rgba(255,255,255,0.5);
+    }
+
+    .step-list li:hover { color: #fff; }
+
+    /* ── CODE BLOCK ── */
+    .code-block {
+      background: #141414;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.45);
+      position: relative;
+      font-family: 'Consolas', 'Courier New', monospace;
+    }
+
+    .code-block::before {
+      content: '● ● ●';
+      display: block;
+      background: #222;
+      color: rgba(255,255,255,0.25);
+      font-size: 0.65rem;
+      letter-spacing: 4px;
+      padding: 0.5rem 1rem;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+
+    .code-block pre {
+      padding: 1.2rem 1.4rem;
+      font-size: 0.82rem;
+      line-height: 1.65;
+      color: #d4d4d4;
+      overflow-x: auto;
+      overflow-y: auto;
+      max-height: 320px; /* matches image height */
+      white-space: pre;
+      margin: 0;
+    }
+  
+    /* HOME BUTTON */
+    .home-btn {
+      text-decoration: none;
+      color: var(--text-light);
+      font-weight: 600;
+      font-size: 0.95rem;
+      padding: 0.45rem 1.1rem;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.08);
+      transition: all 0.25s ease;
+      letter-spacing: 0.3px;
+    }
+
+    .home-btn:hover {
+      background: rgba(255,255,255,0.18);
+      border-color: rgba(255,255,255,0.4);
+      transform: translateY(-1px);
+    }
+
+    /* /* RESPONSIVE */
+
+    @media(max-width:768px){
+
+      .doc-template{
+        grid-template-columns:1fr;
+      }
+
+      h1{
+        font-size:2rem;
+      }
+    }
+</style>
+</head>
+
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="logo">CPTR 325</div>
+    <a href="home.html" class="home-btn">🏠 Home</a>
+  </nav>
+
+  <div class="page-content">
+
+    <!-- TITLE -->
+    <div class="page-title">
+      <h1>Requirement 7: Home Folders with Permissions and Quota</h1>
+    </div>
+
+    <!-- QUOTA DISPLAY -->
+    <div class="quota-card">
+      <h4>🎯 QUOTA LIMIT</h4>
+      <div class="quota-limit">100 MB</div>
+    </div>
+
+    <!-- CODE BLOCK + IMAGE SIDE BY SIDE -->
+    <div class="code-wrap">
+      <h4>Complete PowerShell Automation Script:</h4>
+      <div class="code-image-row">
+
+        <div class="code-block">
+          <pre># HomeFolders-FULL-AUTOMATION.ps1
+# Run on FILE SERVER as Administrator
+
+Import-Module ServerManager
+$ServerName = $env:COMPUTERNAME
+$HomePath = "C:\HomeFolders"
+$Classes = @("COMTECH1A","COMTECH1B","COMTECH2A","COMTECH2B","COMTECH3A","COMTECH3B","COMTECH4A","COMTECH4B")
+
+Write-Host "🚀 STEP 1: Create Folder Structure" -ForegroundColor Cyan
+New-Item -Path $HomePath -ItemType Directory -Force
+foreach ($class in $Classes) {
+    New-Item -Path "$HomePath\$class" -ItemType Directory -Force
+    Write-Host "  📁 $HomePath\$class" -ForegroundColor Green
+}
+
+Write-Host "`n🚀 STEP 2: FSRM Role + Share" -ForegroundColor Cyan
+if (!(Get-WindowsFeature FS-Resource-Manager).Installed) {
+    Install-WindowsFeature -Name FS-Resource-Manager -IncludeManagementTools
+}
+New-SmbShare -Name "HomeFolders$" -Path $HomePath -FullAccess "Administrators" -ChangeAccess "Authenticated Users" -Force
+
+Write-Host "`n🚀 STEP 3: Bulk Student Folders + NTFS" -ForegroundColor Cyan
+Import-Module ActiveDirectory
+foreach ($class in $Classes) {
+    $students = Get-ADUser -Filter * -SearchBase "OU=Users,OU=$class,DC=group2,DC=local"
+    $teacher = Get-ADUser -Filter "Title -like '*Teacher*'" -SearchBase "OU=Teachers,OU=$class,DC=group2,DC=local" | Select -First 1
+
+    foreach ($student in $students) {
+        $folder = "$HomePath\$class\$($student.SamAccountName)-$class"
+        New-Item -Path $folder -ItemType Directory -Force
+
+        icacls $folder /reset /T
+        icacls $folder /inheritance:d
+        icacls $folder /grant "${student.SamAccountName}:(OI)(CI)M"
+        icacls $folder /grant "${teacher.SamAccountName}:(OI)(CI)F"
+        icacls $folder /grant "Administrators:(OI)(CI)F"
+        icacls $folder /grant "CREATOR OWNER:(OI)(CI)(IO)(MU)" /T
+
+        Write-Host "  👤 $($student.SamAccountName) → $folder" -ForegroundColor Yellow
+    }
+}
+
+Write-Host "`n🚀 STEP 4: FSRM 100MB Quota (Per Student)" -ForegroundColor Cyan
+foreach ($class in $Classes) {
+    $students = Get-ADUser -Filter * -SearchBase "OU=Users,OU=$class,DC=group2,DC=local"
+    foreach ($student in $students) {
+        $quotaPath = "$HomePath\$class\$($student.SamAccountName)-$class"
+        if (Test-Path $quotaPath) {
+            dirquota quota add $quotaPath "100MB" "HardQuota" "C:\Windows\QuotaTemplate.xml"
+        }
+    }
+}
+
+Write-Host "`n🚀 STEP 5: AD Home Folder Mapping" -ForegroundColor Cyan
+foreach ($class in $Classes) {
+    $students = Get-ADUser -Filter * -SearchBase "OU=Users,OU=$class,DC=group2,DC=local"
+    foreach ($student in $students) {
+        Set-ADUser $student -HomeDirectory "\\$ServerName\HomeFolders$\$class\$($student.SamAccountName)-$class" -HomeDrive "H:"
+    }
+}
+
+Write-Host "`n✅ COMPLETE! Verify:" -ForegroundColor Green
+Write-Host "   dirquota quota list" -ForegroundColor White
+Write-Host "   echo %HOMEDRIVE% (student login)" -ForegroundColor White</pre>
+        </div>
+
+        <div class="doc-image-wrap">
+          <img src="15.jpg" alt="Printer Properties - Priority & Security" class="doc-image">
+        </div>
+
+      </div>
+    </div>
+
+    <!-- BUTTONS -->
+  <div class="btn-group">
+    <a href="re6.html" class="btn">← Back</a>
+    <a href="https://youtu.be/a472SKwvNJw" target="_blank" rel="noopener noreferrer" class="btn">Watch Here</a>
+    <a href="re8.html" class="btn">Requirement 8 →</a>
+  </div>
+
+  </div><!-- end page-content -->
+
+  <script>
+
+    document
+    .querySelectorAll(".btn")
+    .forEach(btn => {
+
+      if(!btn.hasAttribute("onclick")){
+
+        btn.addEventListener("click", e => {
+
+          e.preventDefault();
+
+          const href =
+          btn.getAttribute("href");
+
+          document
+          .querySelector(".page-content")
+          .classList.add("fade-out");
+
+          setTimeout(() => {
+
+            location.href = href;
+
+          }, 200);
+
+        });
+
+      }
+
+    });
+
+    </script>
+</body>
+</html>

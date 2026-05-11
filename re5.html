@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Requirement 5: Logon Time Restrictions per User | CPTR 325</title>
+
+  <style>
+    :root {
+      --primary-color: #1a1a1a;
+      --primary-dark: #2c2c2c;
+      --secondary-color: #3d3d3d;
+      --accent-color: #8a8a8a;
+
+      --background: #f5f5f3;
+      --section-bg: #eeede9;
+      --surface: #ffffff;
+
+      --text-primary: #1a1f2b;
+      --text-secondary: #4b5563;
+      --text-light: #ffffff;
+
+      --border-color: #d4d2cd;
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+      --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.12);
+      --shadow-lg: 0 15px 40px rgba(0, 0, 0, 0.18);
+
+      --radius: 16px;
+      --radius-lg: 28px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-dark), var(--secondary-color)),
+        url('bg2.jpg');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      color: var(--text-light);
+      line-height: 1.7;
+      min-height: 100vh;
+      padding: 3rem 5%;
+    }
+
+    /* NAVBAR */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      padding: 18px 6%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(28, 28, 28, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      z-index: 1000;
+    }
+
+    .logo {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--text-light);
+      letter-spacing: 1px;
+    }
+
+    /* TITLE */
+    .page-title {
+      text-align: center;
+      margin-top: 6rem;
+      margin-bottom: 2rem;
+    }
+
+    h1 {
+      font-size: 2.75rem;
+      font-weight: 800;
+      background: white;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    h4 {
+      color: var(--accent-color);
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin: 0 0 1rem 0;
+      padding-left: 1rem;
+      border-left: 4px solid var(--accent-color);
+    }
+
+    /* MAIN LAYOUT — 1/3 steps | 2/3 code */
+    .doc-template {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 2rem;
+      align-items: start;
+      margin: 3rem auto;
+      max-width: 1200px;
+    }
+
+    /* ── STEP LIST ── */
+    .step-list {
+      list-style: none;
+      counter-reset: step-counter;
+      padding-left: 0;
+      position: relative;
+    }
+
+    .step-list::before {
+      content: '';
+      position: absolute;
+      left: 18px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 2px;
+    }
+
+    .step-list li {
+      counter-increment: step-counter;
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      margin-bottom: 0.85rem;
+      padding: 0.9rem 1.1rem 0.9rem 0;
+      position: relative;
+      font-size: 0.93rem;
+      line-height: 1.65;
+    }
+
+    .step-list li::before {
+      content: counter(step-counter);
+      min-width: 36px;
+      height: 36px;
+      border-radius: 6px;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.9);
+      flex-shrink: 0;
+      letter-spacing: 0.5px;
+      transition: background 0.25s, border-color 0.25s;
+    }
+
+    .step-list li:hover::before {
+      background: rgba(255,255,255,0.22);
+      border-color: rgba(255,255,255,0.5);
+    }
+
+    .step-list li:hover { color: #fff; }
+
+    /* ── CODE BLOCK ── */
+    .code-block {
+      background: #141414;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.45);
+      position: relative;
+      font-family: 'Consolas', 'Courier New', monospace;
+      width: 100%;
+      min-width: 0; /* prevents grid blowout */
+    }
+
+    .code-block::before {
+      content: '● ● ●';
+      display: block;
+      background: #222;
+      color: rgba(255,255,255,0.25);
+      font-size: 0.65rem;
+      letter-spacing: 4px;
+      padding: 0.5rem 1rem;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+
+    .code-block pre {
+      padding: 1.2rem 1.4rem;
+      font-size: 0.82rem;
+      line-height: 1.65;
+      color: #d4d4d4;
+      overflow-x: auto;
+      overflow-y: auto;
+      max-height: 480px;
+      white-space: pre;
+      margin: 0;
+      text-indent: 0;
+    }
+
+    /* IMAGE */
+    .doc-image {
+      width: 100%;
+      max-width: 700px;
+      height: auto;
+      object-fit: contain;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      display: block;
+      margin: 3rem auto 2rem auto;
+      transition: box-shadow 0.3s ease;
+    }
+
+    .doc-image:hover {
+      box-shadow: 0 0 25px var(--accent-color);
+    }
+
+    /* BUTTONS */
+    .btn-group {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-top: 1rem;
+      margin-bottom: 3rem;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      background: linear-gradient(135deg, var(--accent-color), var(--secondary-color));
+      color: var(--text-light);
+      padding: 1rem 2.2rem;
+      border-radius: var(--radius-lg);
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      text-decoration: none;
+      display: inline-block;
+      border: 2px solid var(--surface);
+      box-shadow: var(--shadow-lg);
+      transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-4px) scale(1.05);
+      background: linear-gradient(135deg, var(--secondary-color), var(--accent-color));
+      border-color: var(--border-color);
+      box-shadow: 0 0 25px var(--accent-color);
+    }
+
+    /* MOBILE */
+    @media (max-width: 768px) {
+      .doc-template { grid-template-columns: 1fr; }
+      h1 { font-size: 2rem; }
+      .doc-image { margin-top: 30px; }
+    }
+
+    /* PAGE TRANSITIONS */
+    @keyframes fadeIn  { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeOut { to   { opacity: 0; transform: translateY(-10px); } }
+    .page-content { animation: fadeIn 0.25s ease both; }
+    .page-content.fade-out { animation: fadeOut 0.2s ease forwards; }
+  
+    /* HOME BUTTON */
+    .home-btn {
+      text-decoration: none;
+      color: var(--text-light);
+      font-weight: 600;
+      font-size: 0.95rem;
+      padding: 0.45rem 1.1rem;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.08);
+      transition: all 0.25s ease;
+      letter-spacing: 0.3px;
+    }
+
+    .home-btn:hover {
+      background: rgba(255,255,255,0.18);
+      border-color: rgba(255,255,255,0.4);
+      transform: translateY(-1px);
+    }
+
+    /* /* RESPONSIVE */ 
+
+    @media(max-width:768px){
+
+      .doc-template{
+        grid-template-columns:1fr;
+      }
+
+      h1{
+        font-size:2rem;
+      }
+
+    }
+
+</style>
+</head>
+
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="logo">CPTR 325</div>
+    <a href="home.html" class="home-btn">🏠 Home</a>
+  </nav>
+
+  <div class="page-content">
+
+    <!-- TITLE -->
+    <div class="page-title">
+      <h1>Requirement 5: Logon Time Restrictions per User</h1>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="doc-template">
+
+      <!-- LEFT: Steps -->
+      <div>
+        <h4>Verification (Exact Steps):</h4>
+        <ol class="step-list">
+          <li><strong>Run PowerShell as Admin</strong></li>
+          <li><strong>Open ADUC</strong> → CT1A OU</li>
+          <li><strong>Check Logon Hours</strong></li>
+          <li><strong>Test login restrictions</strong></li>
+          <li><strong>Enable auto logoff policy</strong></li>
+        </ol>
+      </div>
+
+      <!-- RIGHT: Code -->
+      <div>
+        <h4>🚀 Complete PowerShell Script:</h4>
+        <div class="code-block">
+          <pre>Import-Module ActiveDirectory
+
+function New-LogonArray {
+    return New-Object byte[] 21
+}
+
+function Set-Hour {
+    param($array, $day, $start, $end)
+    for ($h = $start; $h -lt $end; $h++) {
+        $index = ($day * 24) + $h
+        $byte = [math]::Floor($index / 8)
+        $bit = $index % 8
+        $array[$byte] = $array[$byte] -bor (1 -shl $bit)
+    }
+}
+
+# CT1A: Mon-Fri 00:00-09:00
+$ct1a = New-LogonArray
+for ($d=1; $d -le 5; $d++) { Set-Hour $ct1a $d 0 9 }
+Get-ADUser -Filter * -SearchBase "OU=CT1A,DC=group1,DC=local" |
+    ForEach-Object { Set-ADUser $_ -Replace @{logonHours=$ct1a} }
+
+# CT1B: Tue/Thu 00:00-09:00
+$ct1b = New-LogonArray
+Set-Hour $ct1b 2 0 9; Set-Hour $ct1b 4 0 9
+Get-ADUser -Filter * -SearchBase "OU=CT1B,DC=group1,DC=local" |
+    ForEach-Object { Set-ADUser $_ -Replace @{logonHours=$ct1b} }
+
+# CT2A: Mon-Wed 23:00-08:00
+$ct2a = New-LogonArray
+for ($d=1; $d -le 3; $d++) { Set-Hour $ct2a $d 23 24; Set-Hour $ct2a $d 0 8 }
+Get-ADUser -Filter * -SearchBase "OU=CT2A,DC=group1,DC=local" |
+    ForEach-Object { Set-ADUser $_ -Replace @{logonHours=$ct2a} }
+
+# CT2B: Thu-Sat 01:00-10:00
+$ct2b = New-LogonArray
+for ($d=4; $d -le 6; $d++) { Set-Hour $ct2b $d 1 10 }
+Get-ADUser -Filter * -SearchBase "OU=CT2B,DC=group1,DC=local" |
+    ForEach-Object { Set-ADUser $_ -Replace @{logonHours=$ct2b} }
+
+# CT3A: Mon 00:00-04:00
+$ct3a = New-LogonArray; Set-Hour $ct3a 1 0 4
+Get-ADUser -Filter * -SearchBase "OU=CT3A,DC=group1,DC=local" |
+    ForEach-Object { Set-ADUser $_ -Replace @{logonHours=$ct3a} }
+
+# CT3B: Fri 05:00-09:00
+$ct3b = New-LogonArray; Set-Hour $ct3b 5 5 9
+Get-ADUser -Filter * -SearchBase "OU=CT3B,DC=group1,DC=local" |
+    ForEach-Object { Set-ADUser $_ -Replace @{logonHours=$ct3b} }
+
+# CT4A: Sun/Sat 00:00-09:00
+$ct4a = New-LogonArray; Set-Hour $ct4a 0 0 9; Set-Hour $ct4a 6 0 9
+Get-ADUser -Filter * -SearchBase "OU=CT4A,DC=group1,DC=local" |
+    ForEach-Object { Set-ADUser $_ -Replace @{logonHours=$ct4a} }
+
+# CT4B: Wed 02:00-07:00
+$ct4b = New-LogonArray; Set-Hour $ct4b 3 2 7
+Get-ADUser -Filter * -SearchBase "OU=CT4B,DC=group1,DC=local" |
+    ForEach-Object { Set-ADUser $_ -Replace @{logonHours=$ct4b} }
+
+Write-Host "✅ ALL 8 Classes configured!" -ForegroundColor Green</pre>
+        </div>
+      </div>
+
+    </div><!-- end doc-template -->
+
+    <!-- IMAGE -->
+    <img src="6.jpg" alt="AD Logon Hours - CT1A Mon-Fri 00:00-09:00" class="doc-image">
+
+    <!-- BUTTONS -->
+  <div class="btn-group">
+    <a href="re4.html" class="btn">← Back</a>
+    <a href="https://youtu.be/JXPZh_ZknAM" target="_blank" rel="noopener noreferrer" class="btn">Watch Here</a>
+    <a href="re6.html" class="btn">Requirement 6 →</a>
+  </div>
+
+  </div><!-- end page-content -->
+
+  <script>
+
+    document
+    .querySelectorAll(".btn")
+    .forEach(btn => {
+
+      if(!btn.hasAttribute("onclick")){
+
+        btn.addEventListener("click", e => {
+
+          e.preventDefault();
+
+          const href =
+          btn.getAttribute("href");
+
+          document
+          .querySelector(".page-content")
+          .classList.add("fade-out");
+
+          setTimeout(() => {
+
+            location.href = href;
+
+          }, 200);
+
+        });
+
+      }
+
+    });
+
+    </script>
+</body>
+</html>

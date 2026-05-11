@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Requirement 16 - Remote OS Installation | CPTR 325</title>
+
+  <style>
+    :root {
+      --primary-color: #1a1a1a;
+      --primary-dark: #2c2c2c;
+      --secondary-color: #3d3d3d;
+      --accent-color: #8a8a8a;
+
+      --surface: #ffffff;
+      --text-light: #ffffff;
+
+      --border-color: #d4d2cd;
+      --shadow-lg: 0 15px 40px rgba(0, 0, 0, 0.18);
+
+      --radius: 16px;
+      --radius-lg: 28px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-dark), var(--secondary-color)),
+        url('bg2.jpg');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      color: var(--text-light);
+      line-height: 1.7;
+      min-height: 100vh;
+      padding: 3rem 5%;
+    }
+
+    /* NAVBAR */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      padding: 18px 6%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(28, 28, 28, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      z-index: 1000;
+    }
+
+    .logo {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--text-light);
+      letter-spacing: 1px;
+    }
+
+    .nav-links {
+      list-style: none;
+      display: flex;
+      gap: 24px;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--text-light);
+      font-weight: 500;
+      transition: 0.3s ease;
+    }
+
+    .nav-links a:hover { color: #d0d0d0; }
+
+    /* TITLE */
+    .page-title {
+      text-align: center;
+      margin-top: 6rem;
+      margin-bottom: 2.5rem;
+    }
+
+    h1 {
+      font-size: 2.75rem;
+      font-weight: 800;
+      background: white;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    h4 {
+      color: var(--accent-color);
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      padding-left: 1rem;
+      border-left: 4px solid var(--accent-color);
+    }
+
+    /* MAIN LAYOUT */
+    .doc-template {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      align-items: start;
+      margin-bottom: 3rem;
+      margin-left: 5rem;
+      margin-top: 8rem;
+    }
+
+    .doc-template ol li code {
+      background: rgba(0,0,0,0.35);
+      border: 1px solid rgba(120,120,120,0.3);
+      border-radius: 6px;
+      padding: 1px 6px;
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: 0.85rem;
+      color: #c0c0c0;
+    }
+
+    /* IMAGE */
+    .doc-image {
+      width: 100%;
+      max-width: 100%;
+      height: auto;
+      object-fit: contain;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      display: block;
+      margin: 20px auto 0 auto;
+      margin-top: 6rem;
+    }
+
+    .doc-image:hover {
+      box-shadow: 0 0 25px var(--accent-color);
+      transition: box-shadow 0.3s ease;
+    }
+
+    /* BUTTONS */
+    .btn-group {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-top: 3rem;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      background: linear-gradient(135deg, var(--accent-color), var(--secondary-color));
+      color: var(--text-light);
+      padding: 1rem 2.2rem;
+      border-radius: var(--radius-lg);
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      text-decoration: none;
+      display: inline-block;
+      border: 2px solid var(--surface);
+      box-shadow: var(--shadow-lg);
+      transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-4px) scale(1.05);
+      background: linear-gradient(135deg, var(--secondary-color), var(--accent-color));
+      border-color: var(--border-color);
+      box-shadow: 0 0 25px var(--accent-color);
+    }
+
+    @media (max-width: 768px) {
+      .doc-template {
+        grid-template-columns: 1fr;
+        margin-left: 0;
+      }
+      h1 { font-size: 2rem; }
+      .doc-image { margin-top: 30px; }
+    }
+
+    /* PAGE TRANSITIONS */
+    @keyframes fadeIn  { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeOut { to   { opacity: 0; transform: translateY(-10px); } }
+    .page-content { animation: fadeIn 0.25s ease both; }
+    .page-content.fade-out { animation: fadeOut 0.2s ease forwards; }
+  
+    /* ── STEP LIST ── */
+    .step-list {
+      list-style: none;
+      counter-reset: step-counter;
+      padding-left: 0;
+      position: relative;
+    }
+
+    /* vertical track line */
+    .step-list::before {
+      content: '';
+      position: absolute;
+      left: 18px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 2px;
+    }
+
+    .step-list li {
+      counter-increment: step-counter;
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      margin-bottom: 0.85rem;
+      padding: 0.9rem 1.1rem 0.9rem 0;
+      position: relative;
+      font-size: 0.93rem;
+      line-height: 1.65;
+    }
+
+    /* square step tag */
+    .step-list li::before {
+      content: counter(step-counter);
+      min-width: 36px;
+      height: 36px;
+      border-radius: 6px;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.9);
+      flex-shrink: 0;
+      letter-spacing: 0.5px;
+      margin-left: 0;
+      transition: background 0.25s, border-color 0.25s;
+    }
+
+    .step-list li:hover::before {
+      background: rgba(255,255,255,0.22);
+      border-color: rgba(255,255,255,0.5);
+    }
+
+    .step-list li:hover {
+      color: #fff;
+    }
+
+    /* ── CODE BLOCK ── */
+    .code-block {
+      background: #141414;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.45);
+      position: relative;
+      font-family: 'Consolas', 'Courier New', monospace;
+    }
+
+    /* terminal top bar */
+    .code-block::before {
+      content: '● ● ●';
+      display: block;
+      background: #222;
+      color: rgba(255,255,255,0.25);
+      font-size: 0.65rem;
+      letter-spacing: 4px;
+      padding: 0.5rem 1rem;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+
+    .code-block pre {
+      padding: 1.2rem 1.4rem;
+      font-size: 0.82rem;
+      line-height: 1.65;
+      color: #d4d4d4;
+      overflow-x: auto;
+      overflow-y: auto;
+      max-height: 420px;
+      white-space: pre;
+      margin: 0;
+    }
+
+    /* HOME BUTTON */
+    .home-btn {
+      text-decoration: none;
+      color: var(--text-light);
+      font-weight: 600;
+      font-size: 0.95rem;
+      padding: 0.45rem 1.1rem;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.08);
+      transition: all 0.25s ease;
+      letter-spacing: 0.3px;
+    }
+
+    .home-btn:hover {
+      background: rgba(255,255,255,0.18);
+      border-color: rgba(255,255,255,0.4);
+      transform: translateY(-1px);
+    }
+
+
+    /* ── VIDEO SECTION ── */
+    .video-section {
+      max-width: 900px;
+      margin: 2.5rem auto 0 auto;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 14px;
+      padding: 1.2rem 1.5rem;
+    }
+
+    .video-section-label {
+      display: block;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--accent-color);
+      font-weight: 700;
+      margin-bottom: 0.85rem;
+    }
+
+    .video-meta-row {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      flex-wrap: wrap;
+    }
+
+    .video-thumb {
+      flex-shrink: 0;
+      width: 96px;
+      height: 64px;
+      background: #0d0d0d;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: border-color 0.25s;
+    }
+
+    .video-thumb:hover { border-color: rgba(255,255,255,0.35); }
+
+    .play-circle {
+      width: 32px;
+      height: 32px;
+      background: rgba(255,255,255,0.88);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .play-triangle {
+      width: 0; height: 0;
+      border-top: 7px solid transparent;
+      border-bottom: 7px solid transparent;
+      border-left: 12px solid #1a1a1a;
+      margin-left: 3px;
+    }
+
+    .video-meta { flex: 1; min-width: 160px; }
+    .video-meta strong { display: block; font-size: 0.97rem; color: #fff; margin-bottom: 2px; }
+    .video-meta p { margin: 0; font-size: 0.88rem; color: rgba(255,255,255,0.75); }
+
+    .video-toggle-btn {
+      background: rgba(255,255,255,0.11);
+      border: 1px solid rgba(255,255,255,0.25);
+      color: #fff;
+      padding: 0.55rem 1.3rem;
+      border-radius: 24px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      cursor: pointer;
+      transition: all 0.25s;
+      white-space: nowrap;
+    }
+
+    .video-toggle-btn:hover {
+      background: rgba(255,255,255,0.22);
+      border-color: rgba(255,255,255,0.5);
+      transform: translateY(-2px);
+    }
+
+    .video-player-wrap {
+      display: none;
+      margin-top: 1rem;
+    }
+
+    .video-player-wrap.open { display: block; }
+
+    .video-player-wrap video {
+      width: 100%;
+      max-height: 500px;
+      border-radius: 10px;
+      background: #000;
+      outline: none;
+      display: block;
+    }
+
+    /* /* RESPONSIVE */
+
+    @media(max-width:768px){
+
+      .doc-template{
+        grid-template-columns:1fr;
+      }
+
+      h1{
+        font-size:2rem;
+      }
+    }
+
+</style>
+</head>
+
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="logo">CPTR 325</div>
+    <a href="home.html" class="home-btn">🏠 Home</a>
+    <!-- <ul class="nav-links">
+      <li><a href="home.html">Home</a></li>
+      <li><a href="#members">Members</a></li>
+      <li><a href="#requirements">Requirements</a></li>
+      <li><a href="#reflection">Reflection</a></li>
+      <li><a href="#references">References</a></li>
+    </ul> -->
+  </nav>
+
+  <div class="page-content">
+  <!-- TITLE -->
+  <div class="page-title">
+    <h1>Requirement 16: Remote OS Installation</h1>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="doc-template">
+
+    <!-- LEFT: Steps -->
+    <div>
+      <h4>Step-by-Step Procedure:</h4>
+      <ol class="step-list">
+        <li>
+          <div>
+            Server Manager → Manage → Add Roles and Features → Next → Next → Next → Windows Deployment Services → Next<br>
+            ✔ Deployment Server &nbsp;✔ Transport Server → [Install] → Wait → [Close]
+          </div>
+        </li>
+        <li>
+          <div>
+            Tools → Windows Deployment Services<br>
+            ✅ Verify: Install Images → Boot Images → Pending Devices
+          </div>
+        </li>
+        <li>
+          <div>
+            Right-click [Server Name] → Configure Server → Next → <code>D:\RemoteInstall</code> → Next<br>
+            ✔ Respond to all client computers → Next → Next → Finish
+          </div>
+        </li>
+        <li>
+          <div>
+            Mount Windows ISO → <code>D:\sources\boot.wim</code><br>
+            Right-click Boot Images → Add Boot Image → <code>D:\sources\boot.wim</code> → "Windows 10/11 Boot Image" → Next → Next → Finish
+          </div>
+        </li>
+      </ol>
+    </div>
+
+    <!-- RIGHT: Image -->
+    <div>
+      <img src="13.png" alt="WDS Add Boot Image Wizard" class="doc-image">
+    </div>
+
+  </div>
+
+  <!-- BUTTONS -->
+  <div class="btn-group">
+    <a href="re14.html" class="btn">← Back</a>
+    <a href="https://youtu.be/cuLICas2yE8" target="_blank" rel="noopener noreferrer" class="btn">Watch Here</a>
+    <a href="home.html" class="btn">Home →</a>
+  </div>
+
+  </div><!-- end page-content -->
+
+  <script>
+
+    document
+    .querySelectorAll(".btn")
+    .forEach(btn => {
+
+      if(!btn.hasAttribute("onclick")){
+
+        btn.addEventListener("click", e => {
+
+          e.preventDefault();
+
+          const href =
+          btn.getAttribute("href");
+
+          document
+          .querySelector(".page-content")
+          .classList.add("fade-out");
+
+          setTimeout(() => {
+
+            location.href = href;
+
+          }, 200);
+
+        });
+
+      }
+
+    });
+
+    </script>
+</body>
+</html>
